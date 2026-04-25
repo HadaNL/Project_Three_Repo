@@ -1,7 +1,15 @@
+
+let gameData = {
+  cnvW: 900,
+  cnvH: 500,
+  cnvColor: 0,
+  scene: 0
+}
+
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(gameData.cnvW,gameData.cnvH);
 }
 
 function draw() {
-  background(220);
+  background(gameData.cnvColor);
 }

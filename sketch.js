@@ -8,6 +8,9 @@ let gameData = {
 
   cnvColor: 126,
   scene: 0,
+
+  timer: 0,
+
   playerOne_Selector: null,
   playerTwo_Selector: null,
   p1Color: null,
@@ -16,8 +19,9 @@ let gameData = {
   p1_raceAvatar: null,
   p2_raceAvatar: null,
   stageSelector: null,
+  raceStart: false,
 
-  img_Container: []
+  img_Container: [],
 }
 
 function preload() {
@@ -58,8 +62,25 @@ function draw() {
 }
 
 function keyPressed() {
+  if(gameData.scene === 1) {
+    if(gameData.raceStart && key === 'd') {
+      gameData.p1_raceAvatar.move();
+    }
+
+    if(gameData.raceStart && key === 'w') {
+      gameData.p1_raceAvatar.jump();
+    }
+
+    if(gameData.raceStart && key === 'a') {
+      gameData.p2_raceAvatar.move();
+    }
+    
+    if(gameData.raceStart && key === 's') {
+      gameData.p2_raceAvatar.jump();
+    }
+  }
+
   if(gameData.scene === 0) {
- 
     if(gameData.playerOne_Selector.player_ready && gameData.playerTwo_Selector.player_ready ) {
      return ;
     }
@@ -72,27 +93,28 @@ function keyPressed() {
       gameData.playerTwo_Selector.player_ready = true;
     }
 
-    if(key === 'a' && gameData.playerOne_Selector.indicator_position === 0){
+    // player 1 character selector cycles to the right 
+    if(key === 'd' && gameData.playerOne_Selector.indicator_position === 0){
       gameData.playerOne_Selector.indicator_position++;  
-    } else if (key === 'a' && gameData.playerOne_Selector.indicator_position === 1) {
+    } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 1) {
       gameData.playerOne_Selector.indicator_position++;
-    } else if (key === 'a' && gameData.playerOne_Selector.indicator_position === 2) {
+    } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 2) {
       gameData.playerOne_Selector.indicator_position++;
-    } else if (key === 'a' && gameData.playerOne_Selector.indicator_position === 3) {
+    } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 3) {
       gameData.playerOne_Selector.indicator_position++;
-    } else if (key === 'a' && gameData.playerOne_Selector.indicator_position === 4) {
+    } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 4) {
       gameData.playerOne_Selector.indicator_position = 1;
     } 
 
-    if(key === 'd' && gameData.playerTwo_Selector.indicator_position === 0){
+    if(key === 'a' && gameData.playerTwo_Selector.indicator_position === 0){
       gameData.playerTwo_Selector.indicator_position++;
-    } else if (key === 'd' && gameData.playerTwo_Selector.indicator_position === 1) {
+    } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 1) {
       gameData.playerTwo_Selector.indicator_position++;
-    } else if (key === 'd' && gameData.playerTwo_Selector.indicator_position === 2) {
+    } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 2) {
       gameData.playerTwo_Selector.indicator_position++;
-    } else if (key === 'd' && gameData.playerTwo_Selector.indicator_position === 3) {
+    } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 3) {
       gameData.playerTwo_Selector.indicator_position++;
-    } else if (key === 'd' && gameData.playerTwo_Selector.indicator_position === 4) {
+    } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 4) {
       gameData.playerTwo_Selector.indicator_position = 1;
     } 
   }
@@ -251,19 +273,204 @@ class Selection_Indicator {
 }
 
 class Avatar {
-  constructor(aC) {
-    this.avatar_C = aC;
 
-    this.avatar_X = null;
+  constructor(aC,n) {
+    this.avatar_C = aC;
+    this.pNumber = n;
+
+    this.isJumping = false;
+
+    this.avatar_X = 0;
     this.avatar_Y = null;
 
-    if(gameData.stageSelector === 0) {
-      
+    this.frame = 0;
+    this.frameSpeed = 0.15;
+
+    this.moveSpeed = 10;
+    this.jumpForce = 0;
+    this.gravity = 0.5;
+    this.idSize = 10;
+    this.idColor = 0;
+    this.id_Offset = 15;
+    this.idPosX = null;
+    this.idPosY = null;
+
+    if(this.pNumber === 1) {
+      this.avatar_Y = 280;
+    } else {
+      this.avatar_Y = 400;
     }
   }
 
-  show() {
-    
+  show() { 
+    let sprite_H = gameData.character_Selection_Container.height;
+    let scale_By = .09;
+
+    let sprite_Size = sprite_H * scale_By;
+
+    this.jumpForce +=this.gravity;
+    this.avatar_Y +=this.jumpForce;
+
+    if(this.pNumber === 1 && this.avatar_Y > 280) {
+      this.avatar_Y = 280;
+      this.jumpForce = 0;
+      this.isJumping = false;
+    } 
+    if(this.pNumber === 2 && this.avatar_Y > 400) {
+      this.avatar_Y = 400;
+      this.jumpForce = 0;
+      this.isJumping = false; 
+    }
+
+
+    //display 'run' sprite
+    if(this.avatar_C === 'orange' && gameData.raceStart) {
+      if(this.pNumber === 1) {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*(floor(this.frame) + 2),0,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }else {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*(floor(this.frame) + 2),0,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }
+    }else if (this.avatar_C === 'red' && gameData.raceStart) {
+      if(this.pNumber === 1) {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*(floor(this.frame) + 2),256,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }else { 
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*(floor(this.frame) + 2),256,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }
+    }else if (this.avatar_C === 'pink' && gameData.raceStart) {
+      if(this.pNumber === 1) {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*(floor(this.frame) + 2),512,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }else {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*(floor(this.frame) + 2),512,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }
+    }else if (this.avatar_C === 'blue' && gameData.raceStart) {
+      if(this.pNumber === 1) {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*(floor(this.frame) + 2),768,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }else {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*(floor(this.frame) + 2),768,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }
+    }
+
+    //display 'idle' sprites prior to race
+    if(this.avatar_C === 'orange' && !gameData.raceStart) {
+      if(this.pNumber === 1) {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*floor(this.frame),0,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }else {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*floor(this.frame),0,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }
+    }else if (this.avatar_C === 'red' && !gameData.raceStart) {
+      if(this.pNumber === 1) {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*floor(this.frame),256,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }else { 
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*floor(this.frame),256,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }
+    }else if (this.avatar_C === 'pink' && !gameData.raceStart) {
+      if(this.pNumber === 1) {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*floor(this.frame),512,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }else {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*floor(this.frame),512,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }
+    }else if (this.avatar_C === 'blue' && !gameData.raceStart) {
+      if(this.pNumber === 1) {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*floor(this.frame),768,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }else {
+        image(gameData.character_Selection_Container,this.avatar_X,this.avatar_Y,sprite_Size,sprite_Size,256*floor(this.frame),768,255,255);
+        this.frame += this.frameSpeed;
+        if (this.frame >= 2) {
+          this.frame = 0;
+        }
+      }
+    }
+  }
+  
+  show_playerId() {
+    if(this.avatar_C === 'red' || this.avatar_C === 'orange') {
+      this.idPosX = this.avatar_X + this.id_Offset;
+      this.idPosY = this.avatar_Y + this.id_Offset;
+    } else {
+      this.idPosX = this.avatar_X + this.id_Offset;
+      this.idPosY = (this.avatar_Y + this.id_Offset) + 25;
+    }
+
+    if(gameData.raceStart && this.avatar_C === 'pink' || this.avatar_C === 'blue' ) {
+      this.idPosX = this.avatar_X + this.id_Offset;
+      this.idPosY = this.avatar_Y + this.id_Offset;
+    }
+    push();
+    fill(this.idColor);
+    textSize(this.idSize);
+    text('P' + this.pNumber, this.idPosX, this.idPosY);
+    pop();
+  }
+
+  move() {
+    this.avatar_X += this.moveSpeed;
+  }
+
+  jump() {
+    if(this.isJumping === false) {
+      this.jumpForce = -15;
+      this.isJumping = true;
+    }      
   }
 }
 
@@ -302,16 +509,64 @@ function characterSelect() {
 function raceLvl() {
   background(gameData.cnvColor);
 
-  // if(gameData.p1_raceAvatar === null && gameData.p2_raceAvatar === null) {
-  //   gameData.p1_raceAvatar = new Avatar();
-  //   gameData.p2_raceAvatar = new Avatar();
-  //   gameData.stageSelector = floor(random(gameData.img_Container.length));
-  // }
+  if(gameData.p1_raceAvatar === null && gameData.p2_raceAvatar === null) {
+    gameData.p1_raceAvatar = new Avatar(gameData.p1Color, gameData.playerOne_Selector.player_No);
 
-  // image(gameData.img_Container[gameData.stageSelector], gameData.img_PosX,gameData.img_PosY,gameData.cnvW,gameData.cnvH);
-    
-  image(gameData.img_Container[gameData.stageSelector])
-  
-  
+    gameData.p2_raceAvatar = new Avatar(gameData.p2Color,gameData.playerTwo_Selector.player_No);
+    gameData.stageSelector = floor(random(gameData.img_Container.length));
+  }
 
+  image(gameData.img_Container[gameData.stageSelector],gameData.img_PosX,gameData.img_PosY, gameData.cnvW, gameData.cnvH);
+
+  gameData.timer+= deltaTime;
+
+  rStartUp();
+
+  if(gameData.timer > 3000) {
+    //player 1
+    gameData.p1_raceAvatar.show_playerId();
+    gameData.p1_raceAvatar.show();
+    //player 2
+    gameData.p2_raceAvatar.show_playerId();
+    gameData.p2_raceAvatar.show();
+    gameData.raceStart = true;
+  }  
+}
+
+function rStartUp() {
+  push();
+
+  if (gameData.timer > 0 && gameData.timer < 3001) {
+  
+  fill(0,0,0,255);
+  rect(gameData.img_PosX,gameData.img_PosY,gameData.cnvW,gameData.cnvH);
+  }
+
+  if(gameData.timer > 0 && gameData.timer <= 1000) {
+    push();
+    textAlign(CENTER,CENTER);
+    textSize(265);
+    fill(255,255,255);
+    text('READY',442,250);
+    pop();
+  }
+
+  if(gameData.timer > 1000 && gameData.timer <= 2000) {
+    push();
+    textAlign(CENTER,CENTER);
+    textSize(270);
+    fill(255,255,255);
+    text('SET',450,250);
+    pop();
+  }
+
+  if(gameData.timer > 2000 && gameData.timer <= 3000) {
+    push();
+    textAlign(CENTER,CENTER);
+    textSize(270);
+    fill(255,255,255);
+    text('GO',450,250);
+    pop();
+  }
+  pop();
 }

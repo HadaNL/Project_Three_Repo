@@ -118,9 +118,9 @@ function preload() {
   gameData.red_Pink[0] = loadImage("assets/td_character_images/red_Pink/Down.png");
 
 
-  gameData.lock = loadImage("assets/background_images/locked.png");
+  gameData.lock = loadImage("assets/background_Images/locked.png");
 
-  gameData.cityMap_topDown = loadImage("assets/background_images/cityMap.jpg");
+  gameData.cityMap_topDown = loadImage("assets/background_Images/cityMap.jpg");
 
   gameData.character_Selection_Container = loadImage("assets/character_images/character_Sheet_01.png");
 

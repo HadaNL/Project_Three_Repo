@@ -215,8 +215,10 @@ function preload() {
 // SETUP
 // ===================================
 function setup() {
-  createCanvas(gameData.cnvW,gameData.cnvH);
+  let cnv = createCanvas(gameData.cnvW,gameData.cnvH);
   background(gameData.cnvColor);
+
+  cnv.parent('game_Container');
 
   gameData.fx_Container[0].setVolume(0.5);
   gameData.fx_Container[1].setVolume(0.4);

@@ -38,6 +38,8 @@ let gameData = {
   raceEnd: false,
   p1_result: false,
   p2_result: false,
+  countdownStarted: false,
+  musicPlaying: false,
 
   
   aIsPressed: false,
@@ -230,8 +232,13 @@ function setup() {
   gameData.fx_Container[7].setVolume(0.4);
 
   gameData.city_Music.setVolume(0.5);
-  gameData.fx_Container[4].playMode('restart');
-  gameData.fx_Container[7].playMode('restart');
+  for(let i = 0; i < gameData.fx_Container.length; i++) {
+    gameData.fx_Container[i].playMode('restart');
+  }
+
+  for(let i = 0; i < gameData.music_Container.length; i++) {
+    gameData.music_Container[i].playMode('untilDone');
+  }
 }
 
 // ===================================
@@ -322,36 +329,36 @@ function keyPressed() {
   if(gameData.scene === 3 && gameData.raceEnd) {
 
     if(key === 'w' && gameData.playerOne_Selector.pR_indicator_position != 0) {
-      gameData.fx_Container[7].play();
+      soundManager(gameData.fx_Container[7]);
       gameData.playerOne_Selector.s_locked = true;
       return;
     }
 
     if(key === 's' && gameData.playerTwo_Selector.pR_indicator_position != 0) {
-      gameData.fx_Container[7].play();
+      soundManager(gameData.fx_Container[7]);
       gameData.playerTwo_Selector.s_locked = true;
       return;
     }
     
     if(key === 'd' && gameData.playerOne_Selector.pR_indicator_position === 0 && !gameData.playerOne_Selector.s_locked){
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerOne_Selector.pR_indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.pR_indicator_position === 1 && !gameData.playerOne_Selector.s_locked){
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerOne_Selector.pR_indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.pR_indicator_position === 2 && !gameData.playerOne_Selector.s_locked){
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerOne_Selector.pR_indicator_position = 1;
     }
 
     if(key === 'a' && gameData.playerTwo_Selector.pR_indicator_position === 0 && !gameData.playerTwo_Selector.s_locked){
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerTwo_Selector.pR_indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.pR_indicator_position === 1 && !gameData.playerTwo_Selector.s_locked){
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerTwo_Selector.pR_indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.pR_indicator_position === 2 && !gameData.playerTwo_Selector.s_locked){
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerTwo_Selector.pR_indicator_position = 1;
     }
   }
@@ -369,47 +376,47 @@ function keyPressed() {
     }
 
     if(key === 'w' && !gameData.playerOne_Selector.player_ready && gameData.playerOne_Selector.avatar_Color !== null) {
-      gameData.fx_Container[6].play();
+      soundManager(gameData.fx_Container[6]);
       gameData.playerOne_Selector.player_ready = true;
     }
 
     if(key === 's' && !gameData.playerTwo_Selector.player_ready && gameData.playerTwo_Selector.avatar_Color !== null) {
-      gameData.fx_Container[6].play();
+      soundManager(gameData.fx_Container[6]);
       gameData.playerTwo_Selector.player_ready = true;
     }
 
     // player 1 character selector cycles to the right 
     if(key === 'd' && gameData.playerOne_Selector.indicator_position === 0){
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerOne_Selector.indicator_position++;  
     } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 1) {
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerOne_Selector.indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 2) {
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerOne_Selector.indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 3) {
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerOne_Selector.indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 4) {
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerOne_Selector.indicator_position = 1;
     } 
 
     if(key === 'a' && gameData.playerTwo_Selector.indicator_position === 0){
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerTwo_Selector.indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 1) {
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerTwo_Selector.indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 2) {
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerTwo_Selector.indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 3) {
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerTwo_Selector.indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 4) {
-      gameData.fx_Container[4].play();
+      soundManager(gameData.fx_Container[4]);
       gameData.playerTwo_Selector.indicator_position = 1;
     } 
   }
@@ -1236,7 +1243,8 @@ class Avatar {
       this.isJumping = true;      
 
       if(!gameData.raceEnd) {
-        gameData.fx_Container[1].play();
+
+        soundManager(gameData.fx_Container[1]);
       }
     }      
   }
@@ -1258,7 +1266,7 @@ class Avatar {
       }
 
       if(!gameData.raceEnd) {
-        gameData.fx_Container[2].play();
+        soundManager(gameData.fx_Container[2]);
       }
 
       crate.x = -200;
@@ -2069,7 +2077,6 @@ function race_Instructions() {
 // COMPETITVE LEVEL SCENE 3
 // ===================================
 function raceLvl() {
-  let musicPlaying = false;
   let rematch = 'Rematch';
   let c_ontinue = 'Continue';
  
@@ -2081,24 +2088,19 @@ function raceLvl() {
     gameData.p2_raceAvatar = new Avatar(gameData.p2Color,gameData.playerTwo_Selector.player_No);
     gameData.stageSelector = floor(random(gameData.img_Container.length));
 
-    gameData.crates.push(new Crate(950,320,1.0));
-    gameData.crates.push(new Crate(1400,345,1.0));
+    gameData.crates.push(new Crate(950,325,1.0));
+    gameData.crates.push(new Crate(1400,340,1.0));
 
-    gameData.crates.push(new Crate(1300,418,1.0));
-    gameData.crates.push(new Crate(1700,445,1.0));
+    gameData.crates.push(new Crate(1300,415,1.0));
+    gameData.crates.push(new Crate(1700,440,1.0));
   }
 
 
-  for(let i = 0; i < gameData.music_Container.length; i++) {
-    if(gameData.music_Container[i].isPlaying()) {
-      musicPlaying = true;
-    }
-  }
-
-  if(!musicPlaying && gameData.raceStart === true) {
+  if(!gameData.musicPlaying && gameData.raceStart === true) {
     gameData.songSelect = floor(random(0,gameData.music_Container.length));
     gameData.music_Container[gameData.songSelect].setVolume(0.25);
-    gameData.music_Container[gameData.songSelect].play();
+    gameData.music_Container[gameData.songSelect].loop();
+    gameData.musicPlaying = true;
   }
 
   if(gameData.raceEnd === true) {
@@ -2281,8 +2283,8 @@ function cityLvl() {
 
       gameData.zone_Container.push(new Zone(267,76,40,40, 'c_Entrance02'));
 
-      if(!gameData.city_Music.isPlaying()) {
-        gameData.city_Music.play();
+      if(!gameData.city_Music.isLooping()) {
+        gameData.city_Music.loop();
       }
     } 
 
@@ -2296,7 +2298,7 @@ function cityLvl() {
 
           if(gameData.city_Avatar.cA_X > x - 50 && gameData.city_Avatar.cA_X < x + 50 && gameData.city_Avatar.cA_Y > y - 50 && gameData.city_Avatar.cA_Y < y + 50) {
             gameData.city_Avatar.steppedOnDroppings = true;
-            gameData.fx_Container[3].play();
+            soundManager(gameData.fx_Container[3]);
             gameData.city_Avatar.debuffMsg = true;
 
             gameData.city_Avatar.citySpeed = 1.75;
@@ -2344,7 +2346,7 @@ function cityLvl() {
 
     if(gameData.city_Avatar.inHouse && !gameData.city_Avatar.hasHerb && !gameData.city_Avatar.readingQuest) {
       gameData.city_Avatar.readingQuest = true;
-      gameData.fx_Container[5].play();
+      soundManager(gameData.fx_Container[5]);
     }else if (gameData.city_Avatar.inHouse && gameData.city_Avatar.hasHerb) {
       gameData.scene = 5;
     }
@@ -2440,9 +2442,11 @@ function rStartUp() {
       cd_playing = true;
     }
 
-    if(!cd_playing) {
-      gameData.fx_Container[0].play();
+    if(!gameData.countdownStarted) {
+      gameData.countdownStarted = true;
+      soundManager(gameData.fx_Container[0]);
     }
+
     fill(0,0,0,255);
     rect(gameData.img_PosX,gameData.img_PosY,gameData.cnvW,gameData.cnvH);
   }
@@ -2603,9 +2607,12 @@ function run_Fireworks() {
 // RESETS VARIABLES SCENE 1
 // ===================================
 function rematch_Reset() {
+  
   gameData.timer = 0;
+  gameData.countdownStarted = false;
   gameData.raceStart = false;
   gameData.raceEnd = false;
+  gameData.musicPlaying = false;
   gameData.p1_result = false;
   gameData.p2_result = false;
   gameData.fireworks = [];
@@ -2625,5 +2632,17 @@ function rematch_Reset() {
 
   gameData.counter++;
 
+  for(let i = 0; i < gameData.fx_Container.length; i++) {
+    gameData.fx_Container[i].stop();
+  }
 
+
+}
+
+function soundManager(sound) {
+  if(sound.isPlaying()) {
+    sound.stop();
+  }
+
+  sound.play();
 }

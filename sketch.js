@@ -1,4 +1,6 @@
-
+// ===================================
+// GLOBAL VARIABLES
+// ===================================
 let gameData = {
   cnvW: 900,
   cnvH: 500,
@@ -14,19 +16,34 @@ let gameData = {
 
   cityMap_topDown: null,
   lock: null,
+  deadEnd_Sign: null, 
+  watchtower: null,
+  cave_Entrance: null,
+  forest_Thing: null,
+  herb: null,
 
   playerOne_Selector: null,
   playerTwo_Selector: null,
   p1Color: null,
   p2Color: null,
 
+  songSelect: null,
   p1_raceAvatar: null,
   p2_raceAvatar: null,
+  city_Avatar: null,
+  hide_Map: null,
   stageSelector: null,
   raceStart: false,
   raceEnd: false,
   p1_result: false,
   p2_result: false,
+
+  
+  aIsPressed: false,
+  sIsPressed: false,
+  dIsPressed: false,
+  wIsPressed: false,
+
   counter: 0,
 
   startTime: null,
@@ -54,9 +71,51 @@ let gameData = {
   red_Blue: [],
   red_Orange: [],
   red_Pink: [],
+
+  mirror_Red: [],
+  mirror_Orange: [],
+  mirror_Blue: [],
+  mirror_Pink: [],
+
+  zone_Container: [],
+
+  music_Container: [],
+  fx_Container: [],
 }
 
+// ===================================
+// PRELOAD - IMAGES
+// ===================================
 function preload() {
+  gameData.music_Container[0] = loadSound("assets/sounds/Track_01.mp3");
+  gameData.music_Container[1] = loadSound("assets/sounds/Track_02.mp3");
+  gameData.music_Container[2] = loadSound("assets/sounds/Track_03.mp3");
+  gameData.music_Container[3] = loadSound("assets/sounds/Track_04.mp3");
+  
+  gameData.fx_Container[0] = loadSound("assets/sounds/Track_05.mp3");
+  gameData.fx_Container[1] = loadSound("assets/sounds/Track_06.mp3");
+  gameData.fx_Container[2] = loadSound("assets/sounds/Track_07.mp3");
+
+  gameData.mirror_Orange[3] = loadImage("assets/td_character_images/mirror_Orange/Right.png");
+  gameData.mirror_Orange[2] = loadImage("assets/td_character_images/mirror_Orange/Left.png");
+  gameData.mirror_Orange[1] = loadImage("assets/td_character_images/mirror_Orange/Up.png");
+  gameData.mirror_Orange[0] = loadImage("assets/td_character_images/mirror_Orange/Down.png");
+
+  gameData.mirror_Blue[3] = loadImage("assets/td_character_images/mirror_Blue/Right.png");
+  gameData.mirror_Blue[2] = loadImage("assets/td_character_images/mirror_Blue/Left.png");
+  gameData.mirror_Blue[1] = loadImage("assets/td_character_images/mirror_Blue/Up.png");
+  gameData.mirror_Blue[0] = loadImage("assets/td_character_images/mirror_Blue/Down.png");
+
+  gameData.mirror_Red[3] = loadImage("assets/td_character_images/mirror_Red/Right.png");
+  gameData.mirror_Red[2] = loadImage("assets/td_character_images/mirror_Red/Left.png");
+  gameData.mirror_Red[1] = loadImage("assets/td_character_images/mirror_Red/Up.png");
+  gameData.mirror_Red[0] = loadImage("assets/td_character_images/mirror_Red/Down.png");
+
+  gameData.mirror_Pink[3] = loadImage("assets/td_character_images/mirror_Pink/Right.png");
+  gameData.mirror_Pink[2] = loadImage("assets/td_character_images/mirror_Pink/Left.png");
+  gameData.mirror_Pink[1] = loadImage("assets/td_character_images/mirror_Pink/Up.png");
+  gameData.mirror_Pink[0] = loadImage("assets/td_character_images/mirror_Pink/Down.png");
+
   gameData.blue_Orange[3] = loadImage("assets/td_character_images/blue_Orange/Right.png");
   gameData.blue_Orange[2] = loadImage("assets/td_character_images/blue_Orange/Left.png");
   gameData.blue_Orange[1] = loadImage("assets/td_character_images/blue_Orange/Up.png");
@@ -117,9 +176,12 @@ function preload() {
   gameData.red_Pink[1] = loadImage("assets/td_character_images/red_Pink/Up.png");
   gameData.red_Pink[0] = loadImage("assets/td_character_images/red_Pink/Down.png");
 
-
+  gameData.forest_Thing = loadImage("assets/background_Images/ForestThings.png");
+  gameData.herb = loadImage("assets/background_Images/herb.png");
+  gameData.deadEnd_Sign = loadImage("assets/background_Images/deadEnd.png");  
+  gameData.watchtower = loadImage("assets/background_Images/watchtower.png"); 
+  gameData.cave_Entrance = loadImage("assets/background_Images/caveEntrance.png"); 
   gameData.lock = loadImage("assets/background_Images/locked.png");
-
   gameData.cityMap_topDown = loadImage("assets/background_Images/cityMap.jpg");
 
   gameData.character_Selection_Container = loadImage("assets/character_images/character_Sheet_01.png");
@@ -141,33 +203,80 @@ function preload() {
   gameData.img_Container[7] = loadImage("assets/background_Images/bw_city_Stage_off.jpg");  
 }
 
+// ===================================
+// SETUP
+// ===================================
 function setup() {
   createCanvas(gameData.cnvW,gameData.cnvH);
   background(gameData.cnvColor);
 }
 
+// ===================================
+// DRAW 
+// ===================================
 function draw() {
   switch(gameData.scene) {
     case 0:
-      characterSelect();
+      character_Select_Instructions();
       break;
     case 1:
+      characterSelect();
+      break;
+    case 2:
+      race_Instructions()
+      break;
+    case 3:
       raceLvl();
       break; 
-    case 2:
-      cityLvl(); 
+    case 4:
+      cityLvl();
+      break;
+    case 5:
+      last_Scene(); 
     default: 
   }
 }
 
+// ===================================
+// INPUT
+// ===================================
 function keyPressed() {
-  if(gameData.scene === 2) {
+  if(gameData.scene === 4) {
+
     if((key === 'a' || key === 'd' || key === 'w' || key === 's') && gameData.reading_Instructions) {
       gameData.reading_Instructions = false;
-    }
-  } 
+      }
+    
+    if (gameData.city_Avatar !== null) {
+      if(gameData.city_Avatar.readingQuest) {
+        if(key === 'a' || key === 'd' || key === 'w' || key === 's') {
+          gameData.city_Avatar.readingQuest = false;
+          gameData.city_Avatar.inHouse = false; 
+          gameData.city_Avatar.questGiven = true;
 
-  if(gameData.scene === 1) {
+          if(!gameData.city_Avatar.steppedOnDroppings) {
+            gameData.city_Avatar.citySpeed = 2.25;
+          } else {
+            gameData.city_Avatar.citySpeed = 1.75;
+          }
+        }
+      }
+
+      if(gameData.city_Avatar.steppedOnDroppings) {
+        if(key === 'a' || key === 'd' || key === 'w' || key === 's') {
+          gameData.city_Avatar.debuffMsg = false;
+        }
+      }
+
+      if(gameData.city_Avatar.hasHerb) {
+        if(key === 'a' || key === 'd' || key === 'w' || key === 's') {
+          gameData.city_Avatar.herbMsg = false;
+        }
+      }
+    }
+  }
+
+  if(gameData.scene === 3) {
     if(gameData.raceStart && key === 'd') {
       gameData.p1_raceAvatar.frameSpeed = 0.15;
       gameData.p1_raceAvatar.move();
@@ -187,7 +296,7 @@ function keyPressed() {
     }
   }
 
-   if(gameData.scene === 1 && gameData.raceEnd) {
+   if(gameData.scene === 3 && gameData.raceEnd) {
 
     if(key === 'w' && gameData.playerOne_Selector.pR_indicator_position != 0) {
       gameData.playerOne_Selector.s_locked = true;
@@ -216,7 +325,14 @@ function keyPressed() {
     }
   }
 
-  if(gameData.scene === 0) {
+   if(gameData.scene === 2) {
+    if((key === 'a' || key === 'd' || key === 'w' || key === 's')) {
+      gameData.scene = 3;
+      }
+    }
+
+  if(gameData.scene === 1) {
+
     if(gameData.playerOne_Selector.player_ready && gameData.playerTwo_Selector.player_ready ) {
      return ;
     }
@@ -254,8 +370,60 @@ function keyPressed() {
       gameData.playerTwo_Selector.indicator_position = 1;
     } 
   }
+
+  if(gameData.scene === 0) {
+    if((key === 'a' || key === 'd' || key === 'w' || key === 's')) {
+      gameData.scene = 1;
+      }
+    }
 }
 
+// ===================================
+// INVISIBLE WALLS CLASS
+// ===================================
+class Zone{
+  constructor (x,y,w,h,z_name) {
+    this.wall_x = x;
+    this.wall_y = y;
+    this.wall_w = w;
+    this.wall_h = h;
+    this.zone = z_name;
+
+    this.zR = null;
+    this.zG = null;
+    this.zB = null;
+
+    this.z_Opacity = 0;
+  }
+
+  display_Zone() {
+    if (this.zone === 'house' || this.zone === 'stadium' || 
+        this.zone === 'watchtower' || this.zone === 'dead_End' || this.zone === 'c_Entrance01' || 
+        this.zone === 'c_Entrance02') {
+      this.zR = 255;
+      this.zG = 0;
+      this.zB = 0;
+    } else if (this.zone === 'h_zone_01' || this.zone === 'h_zone_02' || this.zone === 'h_zone_03' || this.zone === 'h_zone_04' || this.zone === 'h_zone_05' || this.zone === 'h_zone_06' || this.zone === 'h_zone_07' || this.zone === 'h_zone_08' || this.zone === 'h_zone_09' || this.zone === 'h_zone_10' || this.zone === 'h_zone_11') {
+      this.zR = 0;
+      this.zG = 255;
+      this.zB = 0;
+    }else {
+      this.zR = 255;
+      this.zG = 255;
+      this.zB = 255;
+    }
+
+    push();
+    noStroke();
+    fill(this.zR,this.zG,this.zB,this.z_Opacity);
+    rect(this.wall_x,this.wall_y,this.wall_w,this.wall_h);
+    pop();
+  }
+}
+
+// ===================================
+// SELECTOR INDCATOR CLASS
+// ===================================
 class Selection_Indicator {
   constructor(tS,pNo,x1,y1,x2,y2,sO) {
     this.tSize = tS;
@@ -467,12 +635,27 @@ class Selection_Indicator {
   }
 }
 
+// ===================================
+// AVATAR CLASS
+// ===================================
 class Avatar {
 
   constructor(aC,n) {
     this.avatar_C = aC;
     this.pNumber = n;
 
+    this.questGiven = false;
+    this.readingQuest = false;
+    this.inWatchtower = false;
+    this.inDeadEnd = false;
+    this.inHouse = false;
+    this.inCave_Entrance_01 = false;
+    this.inCave_Entrance_02 = false;
+    this.debuffMsg = false;
+    this.steppedOnDroppings = false; 
+    this.herbMsg = false;
+    this.hasHerb = false;
+    this.canTravel = true;
     this.isJumping = false;
 
     this.avatar_X = 0;
@@ -480,7 +663,7 @@ class Avatar {
 
     this.frame = 0;
     this.frameSpeed = 0;
-
+    this.citySpeed = 2.25; 
     this.moveSpeed = 18;
     this.jumpForce = 0;
     this.gravity = 0.5;
@@ -491,10 +674,29 @@ class Avatar {
     this.idPosY = null;
     this.isWinner = false;
 
+    this.avatar_Size = 30;
+    this.city_Spawn_x = 115;
+    this.city_Spawn_Y = 340;
+
+    this.cA_S = this.avatar_Size;
+    this.cA_X = this.city_Spawn_x;
+    this.cA_Y = this.city_Spawn_Y;
+    this.location = null;
+
     if(this.pNumber === 1) {
       this.avatar_Y = 280;
     } else {
       this.avatar_Y = 400;
+    }
+
+    if(gameData.scene === 4) {
+      if(gameData.p1_raceAvatar.isWinner) {
+        this.carrying_PlayerColor = gameData.p1Color;
+        this.player_Carried = gameData.p2Color;
+      } else if (gameData.p2_raceAvatar.isWinner) {
+        this.carrying_PlayerColor = gameData.p2Color;
+        this.player_Carried = gameData.p1Color;
+      } 
     }
   }
 
@@ -654,6 +856,312 @@ class Avatar {
       }
     }
   }
+
+  showCL () {
+    if(this.carrying_PlayerColor === 'pink' && this.player_Carried === 'pink') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.mirror_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.mirror_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.mirror_Pink[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.mirror_Pink[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.mirror_Pink[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.mirror_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'blue' && this.player_Carried === 'blue') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.mirror_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.mirror_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.mirror_Blue[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.mirror_Blue[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.mirror_Blue[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.mirror_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'orange' && this.player_Carried === 'orange') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.mirror_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.mirror_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.mirror_Orange[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.mirror_Orange[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.mirror_Orange[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.mirror_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'red' && this.player_Carried === 'red') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.mirror_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.mirror_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.mirror_Red[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.mirror_Red[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.mirror_Red[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.mirror_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'orange' && this.player_Carried === 'red') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.orange_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.orange_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.orange_Red[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.orange_Red[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.orange_Red[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.orange_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'orange' && this.player_Carried === 'blue') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.orange_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.orange_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.orange_Blue[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.orange_Blue[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.orange_Blue[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.orange_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'orange' && this.player_Carried === 'pink') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.orange_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.orange_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.orange_Pink[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.orange_Pink[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.orange_Pink[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.orange_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'red' && this.player_Carried === 'orange') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.red_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.red_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.red_Orange[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.red_Orange[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.red_Orange[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.red_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'red' && this.player_Carried === 'pink') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.red_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.red_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.red_Pink[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.red_Pink[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.red_Pink[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.red_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'red' && this.player_Carried === 'blue') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.red_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.red_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.red_Blue[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.red_Blue[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.red_Blue[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.red_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'pink' && this.player_Carried === 'orange') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.pink_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.pink_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.pink_Orange[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.pink_Orange[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.pink_Orange[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.pink_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'pink' && this.player_Carried === 'red') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.pink_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.pink_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.pink_Red[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.pink_Red[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.pink_Red[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.pink_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'pink' && this.player_Carried === 'blue') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.pink_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.pink_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.pink_Blue[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.pink_Blue[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.pink_Blue[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.pink_Blue[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'blue' && this.player_Carried === 'orange') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.blue_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.blue_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.blue_Orange[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.blue_Orange[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.blue_Orange[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.blue_Orange[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'blue' && this.player_Carried === 'red') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.blue_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.blue_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.blue_Red[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.blue_Red[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.blue_Red[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.blue_Red[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+
+    if(this.carrying_PlayerColor === 'blue' && this.player_Carried === 'pink') {
+      if((!gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed && !gameData.wIsPressed)) {
+        image(gameData.blue_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if ((gameData.sIsPressed && (gameData.dIsPressed || gameData.wIsPressed || gameData.aIsPressed) || gameData.dIsPressed && (gameData.wIsPressed || gameData.sIsPressed || gameData.aIsPressed))) {
+        image(gameData.blue_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.sIsPressed) {
+        image(gameData.blue_Pink[2],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.dIsPressed) {
+        image(gameData.blue_Pink[3],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.aIsPressed) {
+        image(gameData.blue_Pink[1],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      } else if (gameData.wIsPressed) {
+        image(gameData.blue_Pink[0],this.cA_X,this.cA_Y,this.cA_S,this.cA_S);
+      }
+    }
+    
+  }
+
+  combined_Movement() {
+    if(keyIsDown(65)) {
+      gameData.aIsPressed = true;
+    } else if (!keyIsDown(65)) {
+      gameData.aIsPressed = false;
+    }
+
+    if(keyIsDown(68)) {
+      gameData.dIsPressed = true;
+    } else if (!keyIsDown(68)) {
+      gameData.dIsPressed = false;
+    }
+
+    if(keyIsDown(87)) {
+      gameData.wIsPressed = true;
+    } else if (!keyIsDown(87)) {
+      gameData.wIsPressed = false;
+    }
+
+    if(keyIsDown(83)) {
+      gameData.sIsPressed = true;
+    } else if (!keyIsDown(83)) {
+      gameData.sIsPressed = false;
+    }
+
+    if(gameData.aIsPressed && !gameData.sIsPressed && !gameData.dIsPressed &&
+      !gameData.wIsPressed) {
+      this.cA_Y -= this.citySpeed;
+    }
+
+    if(gameData.dIsPressed && !gameData.sIsPressed && !gameData.aIsPressed &&
+      !gameData.wIsPressed) {
+      this.cA_X += this.citySpeed;
+    }
+
+    if(gameData.wIsPressed && !gameData.sIsPressed && !gameData.aIsPressed &&
+      !gameData.dIsPressed) {
+      this.cA_Y += this.citySpeed;
+    }
+
+    if(gameData.sIsPressed && !gameData.aIsPressed && !gameData.dIsPressed &&
+      !gameData.wIsPressed) {
+      this.cA_X -= this.citySpeed;
+    }
+
+  }
   
   show_playerId() {
     if(this.avatar_C === 'red' || this.avatar_C === 'orange') {
@@ -682,7 +1190,12 @@ class Avatar {
   jump() {
     if(this.isJumping === false) {
       this.jumpForce = -10;
-      this.isJumping = true;
+      this.isJumping = true;      
+
+      if(!gameData.raceEnd) {
+        gameData.fx_Container[1].setVolume(0.4);
+        gameData.fx_Container[1].play();
+      }
     }      
   }
 
@@ -702,9 +1215,570 @@ class Avatar {
         this.avatar_X -= 5;
       }
 
+      if(!gameData.raceEnd) {
+        gameData.fx_Container[2].setVolume(0.5);
+        gameData.fx_Container[2].play();
+      }
+
       crate.x = -200;
     }
   }
+
+  p_location(object) {
+
+    for(let i = 0; i < object.length; i++) {
+      let obj_x = object[i].wall_x;
+      let obj_y = object[i].wall_y;
+      
+      let obj_w = object[i].wall_w;
+      let obj_h = object[i].wall_h;
+
+      let player_l = object[i].zone;
+
+      if(this.cA_X > obj_x && this.cA_X < (obj_x + obj_w) && this.cA_Y > obj_y &&
+       this.cA_Y < (obj_y + obj_h)) {
+        this.location = player_l;
+       }
+    }  
+  }
+
+  check_Collision() {
+    this.inWatchtower = false;
+    this.inDeadEnd = false;
+    this.inCave_Entrance_01 = false;
+    this.inCave_Entrance_02 = false;
+    let vZ_Container = ['zone_01','zone_02','zone_03','zone_04','zone_05','zone_06','zone_07','zone_08','zone_09','zone_10','zone_11','zone_12','zone_13','zone_14','zone_15']
+
+    let zContainer = gameData.zone_Container;
+    let zX;
+    let zW;
+    let zY;
+    let zH;
+
+    if(vZ_Container.includes(this.location)) {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+        }
+      }
+    } else if (this.location === 'h_zone_01'){
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+            
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+          
+          if(this.cA_Y < zY) {
+            this.cA_Y = zY;
+          }
+        }
+      }
+    } else if (this.location === 'h_zone_02'){
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+            
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+          
+          if(this.cA_Y < zY) {
+            this.cA_Y = zY;
+          }
+
+          push();
+          let b_x1 = (zX+41);
+          let b_y1 = (zY+40);
+          let b_x2 = ((zX+zW-302));
+          let b_y2 = (zY+40);
+
+          let l2_x1 = (b_x2 + 41);
+          let l2_y1 = (zY+40);
+          let l2_x2 = ((b_x2+zW-301));
+          let l2_y2 = (zY+40);
+          
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+          line(b_x1,b_y1,b_x2,b_y2);
+          line(l2_x1,l2_y1,l2_x2,l2_y2);
+
+          if(this.cA_X > zX && this.cA_X < b_x2) {
+            if(this.cA_Y > zY) {
+              this.cA_Y = zY;
+            }
+          }
+
+          if(this.cA_X > l2_x1 && this.cA_X < (l2_x2)) {
+            if(this.cA_Y > zY) {
+              this.cA_Y = zY;
+            }
+          }
+          pop();
+        }
+      }
+    } else if (this.location === 'h_zone_03'){
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+          zH = zContainer[i].wall_h;
+            
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+          
+          let x1 = 41;
+          let x2 = 111;
+
+          let x3 = 125; 
+          let x4 = 241;
+
+          let x5 = 242; 
+          let x6 = 254;
+
+          let x7 = 255;
+          let x8 = 370;
+
+          let x9 = 390;
+          let x10 = 570;
+
+          let b_x1 = (x6);
+          //console.log(b_x1);
+          let b_y1 = (zY+40);
+          let b_x2 = (x7);
+          //console.log(b_x2);
+
+          let b_y2 = (zY+40);
+          push();
+          stroke(zContainer.zR,zContainer.zG,zContainer.zB,zContainer.z_Opacity);
+          line(b_x1, b_y1, b_x2, b_y2);
+          pop();
+          
+          if (this.cA_X > x1 && this.cA_X < x2 || this.cA_X > x3 && this.cA_X < x4 || this.cA_X > x7 && this.cA_X < x8 || this.cA_X > x9 && this.cA_X < x10) {
+            if(this.cA_Y > zY) {
+              this.cA_Y = zY;
+            }else if (this.cA_Y < zY) {
+              this.cA_Y = zY;
+            } 
+          }else if (this.cA_X > x5 && this.cA_X < x6) {
+            if (this.cA_Y < zY) {
+              this.cA_Y = zY;
+            }
+          }
+        }
+      }
+    } else if (this.location === 'h_zone_04'){
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+            
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+          
+          push();
+          let b_x1 = (zX+40);
+          let b_y1 = zY;
+          let b_x2 = (zX + zW - 40);
+          let b_y2 = zY;
+          let mini = b_y1;
+          let maxi = (b_y1);
+
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+
+          line(b_x1,b_y1,b_x2,b_y2);
+
+          this.cA_Y = constrain(this.cA_Y,mini,maxi)
+          pop();
+        }
+      }
+    } else if (this.location === 'h_zone_05') {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+            
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+          
+          push();
+          let b_x1 = (zX+40);
+          let b_y1 = (zY);
+          let b_x2 = (zX+zW-40);
+          let b_y2 = (zY);
+          let mini = b_y1;
+          let maxi = gameData.cnvH;
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+          line(b_x1,b_y1,b_x2,b_y2);
+          this.cA_Y = constrain(this.cA_Y,mini,maxi)
+
+          let other_b_x1 = (zX);
+          let other_b_y1 = (zY + zContainer[i].wall_h);
+          let other_b_x2 = (zX+zW-40);
+          
+          line(other_b_x1,other_b_y1,other_b_x2,other_b_y1);
+
+          if(this.cA_X > other_b_x1 && this.cA_X < other_b_x2) {
+            if(this.cA_Y > zY) {
+              this.cA_Y = zY;
+            }
+          }
+          pop();
+        }
+      }
+    } else if (this.location === 'h_zone_06'){
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+            
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+          
+          push();
+          let b_x1 = (zX+40);
+          let b_y1 = (zY);
+          let b_x2 = (zX+zW);
+          let b_y2 = (zY);
+          let mini = b_y1;
+          let maxi = (b_y1 + 5);
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+          line(b_x1,b_y1,b_x2,b_y2);
+          this.cA_Y = constrain(this.cA_Y,mini,maxi)
+          pop();
+        }
+      }
+    } else if (this.location === 'h_zone_07'){
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+          zH = zContainer[i].wall_h;
+            
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+          
+          let b_x1 = (zX+42);
+          let b_y1 = (zY+40);
+          let b_x2 = (zX+zW);
+          let b_y2 = (zY+40);
+          push();
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+          line(b_x1, b_y1, b_x2, b_y2);
+          pop();
+
+
+          if(this.cA_X > 280 && this.cA_X < 324) {
+            if(this.cA_Y < zY) {
+              this.cA_Y = zY;
+            }
+          } else if(this.cA_X > 325 && this.cA_X < 369) {
+            if(this.cA_Y > zY) {
+              this.cA_Y = zY;
+            }else if (this.cA_Y < zY){
+              this.cA_Y = zY;
+            }
+          } else if(this.cA_X > 370 && this.cA_X < 410) {
+            if(this.cA_Y > zY) {
+              this.cA_Y = zY;
+            }
+          }
+        }
+      }
+    } else if (this.location === 'h_zone_09') {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+          
+          if(this.cA_X < zX) {
+            this.cA_X = zX;
+          }
+
+          if(this.cA_Y > zY) {
+            this.cA_Y = zY;
+          }
+        }
+      }
+    } else if (this.location === 'h_zone_10') {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+
+          this.cA_X = constrain(this.cA_X,zX,zX+(zW-25));
+
+          if(this.cA_Y > zY) {
+            this.cA_Y = zY;
+          } else if (this.cA_Y < zY) {
+            this.cA_Y = zY;
+          } 
+        }
+      }
+    } else if (this.location === 'h_zone_11') {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+
+          this.cA_Y = constrain(this.cA_Y,zY,gameData.cnvH);
+
+          push();
+          let b_x1 = (zX);
+          let b_y1 = (zY);
+          let b_x2 = (zX+zW);
+          let b_y2 = (zY);
+
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+
+          if(this.cA_X > zX + 5) {
+            this.cA_X = zX + 5;
+          }
+          pop();
+        }
+      }
+    } else if (this.location === 'stadium') {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+
+          push();
+          let b_x1 = (zX);
+          let b_y1 = (zY+50);
+          let b_x2 = (zX+zW-40);
+          let b_y2 = (zY+50);
+
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+
+          line(b_x1,b_y1,b_x2,b_y2);
+
+          if(this.cA_Y > zY) {
+            this.cA_Y = zY;
+          }
+          pop();
+        }
+      }
+    } else if (this.location === 'watchtower') {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          this.inWatchtower = true;
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+
+          push();
+          let b_x1 = (zX);
+          let b_y1 = (zY+50);
+          let b_x2 = (zX+zW-40);
+          let b_y2 = (zY+50);
+
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+
+          line(b_x1,b_y1,b_x2,b_y2);
+
+          if(this.cA_Y > zY) {
+            this.cA_Y = zY;
+          }
+          pop();
+        }
+      }
+    } else if (this.location === 'dead_End' ) {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          this.inDeadEnd = true;
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+
+          push();
+          let b_x1 = (zX);
+          let b_y1 = (zY+50);
+          let b_x2 = (zX+zW-40);
+          let b_y2 = (zY+50);
+
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+
+          line(b_x1,b_y1,b_x2,b_y2);
+
+          if(this.cA_Y < zY) {
+            this.cA_Y = zY;
+          }
+          pop();
+        } 
+      }
+    } else if (this.location === 'house') {
+      this.inHouse = true;
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+
+          this.cA_X = constrain(this.cA_X,zX,(zX+(zW-25)));
+
+          push();
+          let b_x1 = (zX);
+          let b_y1 = (zY+50);
+          let b_x2 = (zX+zW-40);
+          let b_y2 = (zY+50);
+
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+
+          line(b_x1,b_y1,b_x2,b_y2);
+
+          if(this.cA_Y < zY) {
+            this.cA_Y = zY;
+          }
+          pop();
+        }
+      }
+    } else if (this.location === 'c_Entrance01') {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          this.inCave_Entrance_01 = true;
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+
+          this.cA_Y = constrain(this.cA_Y,zY,(zY+1));
+
+          push();
+          let b_x1 = (zX+zW);
+          let b_y1 = (zY);
+          let b_x2 = (zX+zW);
+          let b_y2 = (zY);
+
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+
+          line(b_x1,b_y1,b_x2,b_y2);
+
+          if(this.cA_X > zX + 5) {
+            this.cA_X = zX + 5;
+          }
+          pop();
+        }
+      }
+    } else if (this.location === 'c_Entrance02') {
+      for(let i = 0; i < zContainer.length; i++) {
+        if(this.location === zContainer[i].zone) {
+          this.inCave_Entrance_02 = true;
+          zX = zContainer[i].wall_x;
+          zW = zContainer[i].wall_w;
+          zY = zContainer[i].wall_y;
+
+          this.cA_Y = constrain(this.cA_Y,zY,(zY+1));
+
+          push();
+          let b_x1 = (zX+zW);
+          let b_y1 = (zY);
+          let b_x2 = (zX+zW);
+          let b_y2 = (zY);
+
+          stroke(zContainer[i].zR,zContainer[i].zG,zContainer[i].zB,zContainer[i].z_Opacity);
+
+          line(b_x1,b_y1,b_x2,b_y2);
+
+          if(this.cA_X < zX + 5) {
+            this.cA_X = zX + 5;
+          }
+          pop();
+        }
+      }
+    }
+    if (!this.inCave_Entrance_01 && !this.inCave_Entrance_02) {
+      this.canTeleport = true;
+    }
+  }
+
+  showQuest() {
+    let x = gameData.cnvW/2; 
+    let y = gameData.cnvH/2;
+    let w = 400;
+    let h = 200;
+    let color = 0;
+    let cR = 25;
+
+    this.citySpeed = 0;
+    
+    push();
+    fill(color,240);
+    rectMode(CENTER);
+    rect(x,y,w,h,cR);
+    pop();
+
+    push();
+    textAlign(CENTER,CENTER);
+    textSize(20);
+    fill(255,255,255);
+    text(':Quest:',450,190);
+    text('\n\nGo to Forest',450,190);
+    text('\n\n\n\nCollect the herbs',450,190);
+    text('\n\n\n\n\n\nto Heal your friend.',450,190);
+    text('\n\n\n\n\n\n\n\nPress Any Key to Advance',450,190);
+    pop();
+  }
+
+  speedReduction_Msg() {
+    let x = gameData.cnvW/2; 
+    let y = gameData.cnvH/2;
+    let w = 400;
+    let h = 200;
+    let color = 0;
+    let cR = 25;
+    
+    push();
+    fill(color,240);
+    rectMode(CENTER);
+    rect(x,y,w,h,cR);
+    pop();
+
+    push();
+    textAlign(CENTER,CENTER);
+    textSize(20);
+    fill(255,255,255);
+    text(':Speed Reduction:',450,190);
+    text('\n\nYou Stepped on Poop!',450,190);
+    text('\n\n\n\n\nPress Any Key to Advance',450,190);
+    pop();
+  }
+  
+  herb_Picked_Up_Msg() {
+    let x = gameData.cnvW/2; 
+    let y = gameData.cnvH/2;
+    let w = 400;
+    let h = 200;
+    let color = 0;
+    let cR = 25;
+    
+    push();
+    fill(color,240);
+    rectMode(CENTER);
+    rect(x,y,w,h,cR);
+    pop();
+
+    push();
+    textAlign(CENTER,CENTER);
+    textSize(20);
+    fill(255,255,255);
+    text(':Picked Up Herb:',450,190);
+    text('\n\nGet your friend home and heal them!',450,190);
+    text('\n\n\n\n\nPress Any Key to Advance',450,190);
+    pop();
+  }    
 }
 
 // ===================================
@@ -712,7 +1786,6 @@ class Avatar {
 // ===================================
 
 class Firework {
-
   constructor() {
     this.x = random(width);
     this.y = height;
@@ -835,28 +1908,76 @@ class Crate {
   }
 }
 
+// ===================================
+// VISION CLASS Used Gemini for this part of the code
+// ===================================
+
 class Vision {
   constructor () {
+    this.c_value = 0;
+    
     this.x = gameData.cnvW;
     this.y = gameData.cnvH;
-    
-    this.topLayer = createGraphics(this.x,this.y);
-    this.topLayer.rect(gameData.img_PosX,gameData.img_PosY,this.x,this.y);
-    this.topLayer.fill(0);
-    this.topLayer.noStroke();
+  
+    //set constructor property to create an off-screen canvas
+    this.topLayer = createGraphics(this.x,this.y); 
+
+    // give the canvas a color of value 0.
+    this.topLayer.background(this.c_value);
   }
 
   fog() {
+    //if statement check if player is in the watchtower zone
+    //if they are clear the top layer 
+    if(gameData.city_Avatar.inWatchtower) {
+      this.topLayer.clear();
+      image(this.topLayer,0,0);
+      return;
+    } else {
+    //start the erase mode in topLayer  
+      this.topLayer.erase();
 
+    }
+    //make circle around character
+    this.topLayer.ellipse(gameData.city_Avatar.cA_X + (gameData.city_Avatar.cA_S/2), gameData.city_Avatar.cA_Y + (gameData.city_Avatar.cA_S/2),50,50);
+
+    //stop the eraser mode   
+    this.topLayer.noErase();
+
+    //anything between erase noErase draws holes into buffer.
+
+    //layer off screen where black background and erasing is happening and gets printed to see the erasing action
+    image(this.topLayer, 0,0);
   }
 
 }
 
+// ===================================
+// CHARACTER SELECTION SCENE 0
+// ===================================
+function character_Select_Instructions() {
+  background(0)
+  push();
+  textAlign(CENTER,CENTER);
+  textSize(30);
+  fill(255,255,255);
+  text(':Instructions:',450,105);
+  text('\n\nUse switches to select character',450,175);
+  text('\n\n\n\nClick [Down] to cycle through characters',450,175);
+  text('\n\n\n\n\n\nClick [Up] to confirm',450,175);
+  text('\n\n\n\n\n\n\n\n',450,175);
+  text('\n\n\n\n\n\n\n\n\n\n\nPress any button to start!',450,175);
+  pop();
+}
 
+// ===================================
+// CHARACTER SELECTION SCENE 1
+// ===================================
 function characterSelect() {
   background(gameData.cnvColor);
 
   if(gameData.playerOne_Selector === null && gameData.playerTwo_Selector === null) {
+    gameData.reading_Instructions = true;
     gameData.playerOne_Selector = new Selection_Indicator(30,1,0,0,0,0,255);
 
     gameData.playerTwo_Selector = new Selection_Indicator(30,2,0,0,0,0,255);
@@ -881,11 +2002,33 @@ function characterSelect() {
   gameData.p2Color = gameData.playerTwo_Selector.displayIndicator();
 
   if (gameData.playerOne_Selector.player_ready && gameData.playerTwo_Selector.player_ready) {
-    gameData.scene = 1;
+    gameData.scene = 2;
   }
 }
 
+// ===================================
+// CHARACTER SELECTION SCENE 2
+// ===================================
+function race_Instructions() {
+  background(0)
+  push();
+  textAlign(CENTER,CENTER);
+  textSize(30);
+  fill(255,255,255);
+  text(':Instructions:',450,105);
+  text('\n\nUse switches to move character',450,175);
+  text('\n\n\n\nClick [Down] to Run',450,175);
+  text('\n\n\n\n\n\nClick [Up] to Jump',450,175);
+  text('\n\n\n\n\n\n\n\nObjective: Get to the Finish Line',450,175);
+  text('\n\n\n\n\n\n\n\n\n\n\nPress any button to start!',450,175);
+  pop();
+}
+
+// ===================================
+// COMPETITVE LEVEL SCENE 3
+// ===================================
 function raceLvl() {
+  let musicPlaying = false;
   let rematch = 'Rematch';
   let c_ontinue = 'Continue';
  
@@ -897,13 +2040,30 @@ function raceLvl() {
     gameData.p2_raceAvatar = new Avatar(gameData.p2Color,gameData.playerTwo_Selector.player_No);
     gameData.stageSelector = floor(random(gameData.img_Container.length));
 
-    gameData.crates.push(new Crate(950,340,1.0));
-    gameData.crates.push(new Crate(1400,350,1.0));
+    gameData.crates.push(new Crate(950,320,1.0));
+    gameData.crates.push(new Crate(1400,345,1.0));
 
-    gameData.crates.push(new Crate(1300,440,1.0));
+    gameData.crates.push(new Crate(1300,418,1.0));
     gameData.crates.push(new Crate(1700,445,1.0));
   }
 
+
+  for(let i = 0; i < gameData.music_Container.length; i++) {
+    if(gameData.music_Container[i].isPlaying()) {
+      musicPlaying = true;
+    }
+  }
+
+  if(!musicPlaying && gameData.raceStart === true) {
+    gameData.songSelect = floor(random(0,gameData.music_Container.length));
+    gameData.music_Container[gameData.songSelect].setVolume(0.25);
+    gameData.music_Container[gameData.songSelect].play();
+  }
+
+  if(gameData.raceEnd === true) {
+    gameData.music_Container[gameData.songSelect].stop();
+  }
+  
   image(gameData.img_Container[gameData.stageSelector],gameData.img_PosX,gameData.img_PosY, gameData.cnvW, gameData.cnvH);
 
   gameData.timer+= deltaTime;
@@ -931,8 +2091,8 @@ function raceLvl() {
     }
   }
 
-  if(gameData.p1_raceAvatar.avatar_X >= gameData.finishLine ||
-     gameData.p2_raceAvatar.avatar_X >= gameData.finishLine) {
+  if(gameData.p1_raceAvatar.avatar_X >= gameData.finishLine && !gameData.p1_raceAvatar.isJumping ||
+     gameData.p2_raceAvatar.avatar_X >= gameData.finishLine && !gameData.p2_raceAvatar.isJumping) {
     gameData.raceEnd = true;
   }
 
@@ -945,7 +2105,6 @@ function raceLvl() {
       gameData.p2_result = gameData.p2_raceAvatar.race_Result();
     }
 
-    
     gameData.p1_raceAvatar.stop_Movement();
     gameData.p2_raceAvatar.stop_Movement();
 
@@ -956,7 +2115,6 @@ function raceLvl() {
 
     gameData.playerOne_Selector.post_Race_Select();
     gameData.playerTwo_Selector.post_Race_Select();
-
 
     if(gameData.playerOne_Selector.p_selection === rematch 
       && gameData.playerTwo_Selector.p_selection === rematch) { 
@@ -970,7 +2128,7 @@ function raceLvl() {
       }
       
     if(gameData.playerOne_Selector.p_selection === c_ontinue && gameData.playerTwo_Selector.p_selection === c_ontinue) {
-      gameData.scene = 2;
+      gameData.scene = 4;
       gameData.reading_Instructions = true;
     }else if (gameData.playerOne_Selector.p_selection === c_ontinue 
       && gameData.playerTwo_Selector.p_selection === rematch) {
@@ -982,6 +2140,9 @@ function raceLvl() {
   } 
 }
 
+// ===================================
+// COLLABORATION LEVEL SCENE 4
+// ===================================
 function cityLvl() {
   
   if(gameData.reading_Instructions) {
@@ -999,7 +2160,7 @@ function cityLvl() {
     
     push();
     textAlign(CENTER,CENTER);
-    textSize(20);
+    textSize(30);
     fill(255,255,255);
     text(injury_msg,450,200);
     text('\n\nUse all the buttons to move around the map',450,200);
@@ -1011,17 +2172,232 @@ function cityLvl() {
   if(!gameData.reading_Instructions) {
     image(gameData.cityMap_topDown,gameData.img_PosX,gameData.img_PosY,gameData.cnvW, gameData.cnvH);
 
+    if(gameData.city_Avatar === null) {
+      gameData.city_Avatar = new Avatar (gameData.p1Color, gameData.playerOne_Selector.player_No);
+      gameData.hide_Map = new Vision();
+
+      gameData.zone_Container.push(new Zone(1,58,40,180, 'zone_01'));
+
+      gameData.zone_Container.push(new Zone(1,278,40,180, 'zone_02'));
+
+      gameData.zone_Container.push(new Zone(52,58,40,80, 'zone_03'));
+
+      gameData.zone_Container.push(new Zone(111,58,40,180, 'zone_04'));
+
+      gameData.zone_Container.push(new Zone(111,278,40,60, 'zone_05'));
+
+      gameData.zone_Container.push(new Zone(242,278,40,180, 'zone_06'));
+
+      gameData.zone_Container.push(new Zone(370,58,40,180, 'zone_07'));
+
+      gameData.zone_Container.push(new Zone(370,278,40,97, 'zone_08'));
+      
+      gameData.zone_Container.push(new Zone(571,178,40,60, 'zone_09'));
+
+      gameData.zone_Container.push(new Zone(571,278,40,180, 'zone_10'));
+
+      gameData.zone_Container.push(new Zone(631,58,40,160, 'zone_11'));
+
+      gameData.zone_Container.push(new Zone(852,113,40,105, 'zone_12'));
+
+      gameData.zone_Container.push(new Zone(852,258,40,200, 'zone_13'));
+
+      gameData.zone_Container.push(new Zone(306,116,40,80, 'zone_14'));
+
+      gameData.zone_Container.push(new Zone(290,415,40,41, 'zone_15'));
+
+      gameData.zone_Container.push(new Zone(852,73,40,40, 'house'));
+
+      gameData.zone_Container.push(new Zone(571,138,40,40, 'dead_End'));
+
+      gameData.zone_Container.push(new Zone(52,138,40,40, 'watchtower'));
+
+      gameData.zone_Container.push(new Zone(111,338,40,40, 'stadium'));
+
+      gameData.zone_Container.push(new Zone(1,18,91,40, 'h_zone_01'));
+
+      gameData.zone_Container.push(new Zone(111,18,560,40, 'h_zone_02'));
+
+      gameData.zone_Container.push(new Zone(1,238,610,40, 'h_zone_03'));
+
+      gameData.zone_Container.push(new Zone(1,458,281,40, 'h_zone_04'));
+
+      gameData.zone_Container.push(new Zone(631,218,261,40, 'h_zone_05'));
+
+      gameData.zone_Container.push(new Zone(571,456,321,40, 'h_zone_06'));
+
+      gameData.zone_Container.push(new Zone(290,375,120,40, 'h_zone_07'));
+
+
+      gameData.zone_Container.push(new Zone(290,456,40,40, 'h_zone_09'));
+
+      gameData.zone_Container.push(new Zone(187,196,159,40, 'h_zone_10'));
+
+      gameData.zone_Container.push(new Zone(307,76,39,40, 'h_zone_11'));
+
+      gameData.zone_Container.push(new Zone(330,456,40,40, 'c_Entrance01'));
+
+      gameData.zone_Container.push(new Zone(267,76,40,40, 'c_Entrance02'));
+    } 
+
+    if(!gameData.city_Avatar.steppedOnDroppings && !gameData.city_Avatar.questGiven && !gameData.city_Avatar.hasHerb && gameData.city_Avatar.location === 'h_zone_10') {
+      image(gameData.forest_Thing,gameData.img_PosX,gameData.img_PosY,gameData.cnvW, gameData.cnvH);
+
+      for(let i = 0; i < gameData.zone_Container.length; i++) {
+        if(gameData.zone_Container[i].zone === gameData.city_Avatar.location) {
+          let x = gameData.zone_Container[i].wall_x;
+          let y = gameData.zone_Container[i].wall_y;
+
+          if(gameData.city_Avatar.cA_X > x - 50 && gameData.city_Avatar.cA_X < x + 50 && gameData.city_Avatar.cA_Y > y - 50 && gameData.city_Avatar.cA_Y < y + 50) {
+            gameData.city_Avatar.steppedOnDroppings = true;
+
+            gameData.city_Avatar.debuffMsg = true;
+
+            gameData.city_Avatar.citySpeed = 1.75;
+          }
+        }
+      }
+    }
+    
+    if(gameData.city_Avatar.questGiven && !gameData.city_Avatar.hasHerb && gameData.city_Avatar.location === 'h_zone_10') {
+      
+      image(gameData.herb,gameData.img_PosX,gameData.img_PosY,gameData.cnvW, gameData.cnvH);
+
+      for(let i = 0; i < gameData.zone_Container.length; i++) {
+        if(gameData.zone_Container[i].zone === gameData.city_Avatar.location) {
+          let x = gameData.zone_Container[i].wall_x;
+          let y = gameData.zone_Container[i].wall_y;
+
+          if(gameData.city_Avatar.cA_X > x - 50 && gameData.city_Avatar.cA_X < x + 50 && gameData.city_Avatar.cA_Y > y - 50 && gameData.city_Avatar.cA_Y < y + 50) {
+            gameData.city_Avatar.hasHerb = true;
+
+            gameData.city_Avatar.herbMsg = true;
+          }
+        }
+      }
+    }
+
+    for(let i = 0; i < gameData.zone_Container.length; i++) {
+      gameData.zone_Container[i].display_Zone();
+    }
+
+    gameData.city_Avatar.combined_Movement();
+    gameData.city_Avatar.showCL();
+
+    image(gameData.watchtower,gameData.img_PosX,gameData.img_PosY,gameData.cnvW, gameData.cnvH);
+    
+    image(gameData.cave_Entrance,gameData.img_PosX,gameData.img_PosY,gameData.cnvW, gameData.cnvH);
+    
+    gameData.hide_Map.fog();
+    gameData.city_Avatar.p_location(gameData.zone_Container);
+    gameData.city_Avatar.check_Collision();
+
+    if(gameData.city_Avatar.inDeadEnd) {
+      image(gameData.deadEnd_Sign,gameData.img_PosX,gameData.img_PosY,gameData.cnvW, gameData.cnvH);
+    }
+
+    if(gameData.city_Avatar.inHouse && !gameData.city_Avatar.hasHerb && !gameData.city_Avatar.readingQuest) {
+      gameData.city_Avatar.readingQuest = true;
+    }else if (gameData.city_Avatar.inHouse && gameData.city_Avatar.hasHerb) {
+      gameData.scene = 5;
+    }
+    
+    if(gameData.city_Avatar.inCave_Entrance_01 && gameData.city_Avatar.canTravel) {
+      for(let i = 0; i < gameData.zone_Container.length; i++) {
+        if(gameData.zone_Container[i].zone === 'c_Entrance02') {
+
+          let c_Entrance_x = gameData.zone_Container[i].wall_x;
+          let c_Entrance_y = gameData.zone_Container[i].wall_y;
+
+          gameData.city_Avatar.cA_X = (c_Entrance_x + 42);
+          gameData.city_Avatar.cA_Y = c_Entrance_y;
+
+          gameData.city_Avatar.inCave_Entrance_01 = false;
+          gameData.city_Avatar.canTeleport = false;
+
+          break;
+        }
+      }
+    }else if(gameData.city_Avatar.inCave_Entrance_02 && gameData.city_Avatar.canTravel) {
+      for(let i = 0; i < gameData.zone_Container.length; i++) {
+        if(gameData.zone_Container[i].zone === 'c_Entrance01') {
+
+          let c_Entrance_x = gameData.zone_Container[i].wall_x;
+          let c_Entrance_y = gameData.zone_Container[i].wall_y;
+
+          gameData.city_Avatar.cA_X = (c_Entrance_x - 35);
+          gameData.city_Avatar.cA_Y = c_Entrance_y;
+
+          gameData.city_Avatar.inCave_Entrance_02 = false;
+          gameData.city_Avatar.canTeleport = false;
+
+          break;
+        }
+      }
+    }
+    
+    if(gameData.city_Avatar.readingQuest) {
+      gameData.city_Avatar.showQuest();
+    }
+
+    if(gameData.city_Avatar.debuffMsg) {
+      gameData.city_Avatar.speedReduction_Msg();
+    }
+
+    if(gameData.city_Avatar.herbMsg) {
+      gameData.city_Avatar.herb_Picked_Up_Msg();
+    }
     
   }
 }
 
+// ===================================
+// COLLABORATION LEVEL SCENE 5
+// ===================================
+function last_Scene() {
+    background(0);
+
+    let x = gameData.cnvW/2; 
+    let y = gameData.cnvH/2;
+    let w = 400;
+    let h = 200;
+    let color = 0;
+    let cR = 25;
+
+    push();
+    fill(color,240);
+    rectMode(CENTER);
+    rect(x,y,w,h,cR);
+    pop();
+
+    push();
+    textAlign(CENTER,CENTER);
+    textSize(30);
+    fill(255,255,255);
+    text(':The End:',450,190);
+    text('\n\nCreated By',450,190);
+    text('\n\n\n\nJacob, Jonathan, and Hector',450,190);
+    text('\n\n\n\n\n\nPress [F5] to Play Again!',450,190);
+    pop();
+}
+
+// ===================================
+// RACE COUNTDOWN DISPLAY
+// ===================================
 function rStartUp() {
+  let cd_playing = false;
   push();
 
   if (gameData.timer > 0 && gameData.timer < 3001) {
-  
-  fill(0,0,0,255);
-  rect(gameData.img_PosX,gameData.img_PosY,gameData.cnvW,gameData.cnvH);
+    if(gameData.fx_Container[0].isPlaying()){
+      cd_playing = true;
+    }
+
+    if(!cd_playing) {
+      gameData.fx_Container[0].play();
+    }
+    fill(0,0,0,255);
+    rect(gameData.img_PosX,gameData.img_PosY,gameData.cnvW,gameData.cnvH);
   }
 
   if(gameData.timer > 0 && gameData.timer <= 1000) {
@@ -1053,6 +2429,9 @@ function rStartUp() {
   pop();
 }
 
+// ===================================
+// RACE RESULTS DISPLAY
+// ===================================
 function display_Results() {
   let winMsg = null;
 
@@ -1071,10 +2450,12 @@ function display_Results() {
     fill(255,255,255);
     text(winMsg,450,250);
     pop();
-    console.log(winMsg);
   }
 }
 
+// ===================================
+// REMATCH BUTTON
+// ===================================
 function rematch_Button() {
   let bX = 300;  
   let bY = 350;
@@ -1096,6 +2477,9 @@ function rematch_Button() {
   pop();
 }
 
+// ===================================
+// CONTINUE BUTTON
+// ===================================
 function continue_Button() {
   let bX = 500;  
   let bY = 350;
@@ -1118,6 +2502,9 @@ function continue_Button() {
   pop();
 }
 
+// ===================================
+// RUNS FIREWORKS
+// ===================================
 function run_Fireworks() {
   if(gameData.startTime === null) {
     gameData.startTime = millis();
@@ -1165,6 +2552,9 @@ function run_Fireworks() {
   }
 }
 
+// ===================================
+// RESETS VARIABLES SCENE 1
+// ===================================
 function rematch_Reset() {
   gameData.timer = 0;
   gameData.raceStart = false;

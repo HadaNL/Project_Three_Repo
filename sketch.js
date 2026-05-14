@@ -14,6 +14,7 @@ let gameData = {
   timer: 0,
   finishLine: 800,
 
+  city_Music: null,
   cityMap_topDown: null,
   lock: null,
   deadEnd_Sign: null, 
@@ -87,6 +88,8 @@ let gameData = {
 // PRELOAD - IMAGES
 // ===================================
 function preload() {
+  gameData.city_Music = loadSound("assets/sounds/Track_08.mp3");
+
   gameData.music_Container[0] = loadSound("assets/sounds/Track_01.mp3");
   gameData.music_Container[1] = loadSound("assets/sounds/Track_02.mp3");
   gameData.music_Container[2] = loadSound("assets/sounds/Track_03.mp3");
@@ -95,6 +98,11 @@ function preload() {
   gameData.fx_Container[0] = loadSound("assets/sounds/Track_05.mp3");
   gameData.fx_Container[1] = loadSound("assets/sounds/Track_06.mp3");
   gameData.fx_Container[2] = loadSound("assets/sounds/Track_07.mp3");
+  gameData.fx_Container[3] = loadSound("assets/sounds/Track_09.mp3");
+  gameData.fx_Container[4] = loadSound("assets/sounds/Track_10.mp3");
+  gameData.fx_Container[5] = loadSound("assets/sounds/Track_11.mp3");
+  gameData.fx_Container[6] = loadSound("assets/sounds/Track_12.mp3");
+  gameData.fx_Container[7] = loadSound("assets/sounds/Track_13.mp3");
 
   gameData.mirror_Orange[3] = loadImage("assets/td_character_images/mirror_Orange/Right.png");
   gameData.mirror_Orange[2] = loadImage("assets/td_character_images/mirror_Orange/Left.png");
@@ -209,6 +217,19 @@ function preload() {
 function setup() {
   createCanvas(gameData.cnvW,gameData.cnvH);
   background(gameData.cnvColor);
+
+  gameData.fx_Container[0].setVolume(0.5);
+  gameData.fx_Container[1].setVolume(0.4);
+  gameData.fx_Container[2].setVolume(0.5);
+  gameData.fx_Container[3].setVolume(0.5);
+  gameData.fx_Container[4].setVolume(0.4);
+  gameData.fx_Container[5].setVolume(0.4);
+  gameData.fx_Container[6].setVolume(0.4);
+  gameData.fx_Container[7].setVolume(0.4);
+
+  gameData.city_Music.setVolume(0.5);
+  gameData.fx_Container[4].playMode('restart');
+  gameData.fx_Container[7].playMode('restart');
 }
 
 // ===================================
@@ -296,31 +317,39 @@ function keyPressed() {
     }
   }
 
-   if(gameData.scene === 3 && gameData.raceEnd) {
+  if(gameData.scene === 3 && gameData.raceEnd) {
 
     if(key === 'w' && gameData.playerOne_Selector.pR_indicator_position != 0) {
+      gameData.fx_Container[7].play();
       gameData.playerOne_Selector.s_locked = true;
       return;
     }
 
     if(key === 's' && gameData.playerTwo_Selector.pR_indicator_position != 0) {
+      gameData.fx_Container[7].play();
       gameData.playerTwo_Selector.s_locked = true;
       return;
     }
     
     if(key === 'd' && gameData.playerOne_Selector.pR_indicator_position === 0 && !gameData.playerOne_Selector.s_locked){
+      gameData.fx_Container[4].play();
       gameData.playerOne_Selector.pR_indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.pR_indicator_position === 1 && !gameData.playerOne_Selector.s_locked){
+      gameData.fx_Container[4].play();
       gameData.playerOne_Selector.pR_indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.pR_indicator_position === 2 && !gameData.playerOne_Selector.s_locked){
+      gameData.fx_Container[4].play();
       gameData.playerOne_Selector.pR_indicator_position = 1;
     }
 
     if(key === 'a' && gameData.playerTwo_Selector.pR_indicator_position === 0 && !gameData.playerTwo_Selector.s_locked){
+      gameData.fx_Container[4].play();
       gameData.playerTwo_Selector.pR_indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.pR_indicator_position === 1 && !gameData.playerTwo_Selector.s_locked){
+      gameData.fx_Container[4].play();
       gameData.playerTwo_Selector.pR_indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.pR_indicator_position === 2 && !gameData.playerTwo_Selector.s_locked){
+      gameData.fx_Container[4].play();
       gameData.playerTwo_Selector.pR_indicator_position = 1;
     }
   }
@@ -338,35 +367,47 @@ function keyPressed() {
     }
 
     if(key === 'w' && !gameData.playerOne_Selector.player_ready && gameData.playerOne_Selector.avatar_Color !== null) {
+      gameData.fx_Container[6].play();
       gameData.playerOne_Selector.player_ready = true;
     }
 
     if(key === 's' && !gameData.playerTwo_Selector.player_ready && gameData.playerTwo_Selector.avatar_Color !== null) {
+      gameData.fx_Container[6].play();
       gameData.playerTwo_Selector.player_ready = true;
     }
 
     // player 1 character selector cycles to the right 
     if(key === 'd' && gameData.playerOne_Selector.indicator_position === 0){
+      gameData.fx_Container[4].play();
       gameData.playerOne_Selector.indicator_position++;  
     } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 1) {
+      gameData.fx_Container[4].play();
       gameData.playerOne_Selector.indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 2) {
+      gameData.fx_Container[4].play();
       gameData.playerOne_Selector.indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 3) {
+      gameData.fx_Container[4].play();
       gameData.playerOne_Selector.indicator_position++;
     } else if (key === 'd' && gameData.playerOne_Selector.indicator_position === 4) {
+      gameData.fx_Container[4].play();
       gameData.playerOne_Selector.indicator_position = 1;
     } 
 
     if(key === 'a' && gameData.playerTwo_Selector.indicator_position === 0){
+      gameData.fx_Container[4].play();
       gameData.playerTwo_Selector.indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 1) {
+      gameData.fx_Container[4].play();
       gameData.playerTwo_Selector.indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 2) {
+      gameData.fx_Container[4].play();
       gameData.playerTwo_Selector.indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 3) {
+      gameData.fx_Container[4].play();
       gameData.playerTwo_Selector.indicator_position++;
     } else if (key === 'a' && gameData.playerTwo_Selector.indicator_position === 4) {
+      gameData.fx_Container[4].play();
       gameData.playerTwo_Selector.indicator_position = 1;
     } 
   }
@@ -1193,7 +1234,6 @@ class Avatar {
       this.isJumping = true;      
 
       if(!gameData.raceEnd) {
-        gameData.fx_Container[1].setVolume(0.4);
         gameData.fx_Container[1].play();
       }
     }      
@@ -1216,7 +1256,6 @@ class Avatar {
       }
 
       if(!gameData.raceEnd) {
-        gameData.fx_Container[2].setVolume(0.5);
         gameData.fx_Container[2].play();
       }
 
@@ -1710,8 +1749,8 @@ class Avatar {
     let w = 400;
     let h = 200;
     let color = 0;
-    let cR = 25;
-
+    let cR = 25;    
+    
     this.citySpeed = 0;
     
     push();
@@ -2165,6 +2204,7 @@ function cityLvl() {
     text(injury_msg,450,200);
     text('\n\nUse all the buttons to move around the map',450,200);
     text('\n\n\n\nPress any button to start!',450,200);
+    text('\n\n\n\n\n\n\nHint: Look for the watchtower',450,200);
     pop();
     
   }
@@ -2238,6 +2278,10 @@ function cityLvl() {
       gameData.zone_Container.push(new Zone(330,456,40,40, 'c_Entrance01'));
 
       gameData.zone_Container.push(new Zone(267,76,40,40, 'c_Entrance02'));
+
+      if(!gameData.city_Music.isPlaying()) {
+        gameData.city_Music.play();
+      }
     } 
 
     if(!gameData.city_Avatar.steppedOnDroppings && !gameData.city_Avatar.questGiven && !gameData.city_Avatar.hasHerb && gameData.city_Avatar.location === 'h_zone_10') {
@@ -2250,7 +2294,7 @@ function cityLvl() {
 
           if(gameData.city_Avatar.cA_X > x - 50 && gameData.city_Avatar.cA_X < x + 50 && gameData.city_Avatar.cA_Y > y - 50 && gameData.city_Avatar.cA_Y < y + 50) {
             gameData.city_Avatar.steppedOnDroppings = true;
-
+            gameData.fx_Container[3].play();
             gameData.city_Avatar.debuffMsg = true;
 
             gameData.city_Avatar.citySpeed = 1.75;
@@ -2298,6 +2342,7 @@ function cityLvl() {
 
     if(gameData.city_Avatar.inHouse && !gameData.city_Avatar.hasHerb && !gameData.city_Avatar.readingQuest) {
       gameData.city_Avatar.readingQuest = true;
+      gameData.fx_Container[5].play();
     }else if (gameData.city_Avatar.inHouse && gameData.city_Avatar.hasHerb) {
       gameData.scene = 5;
     }

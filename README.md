@@ -1,2 +1,8 @@
 # Project_Three_Repo
-This repo is for a school project.  The class is Art 259 and the project is the final project. 
+This repo is for the Art 259 Final.
+
+Team Members
+Jonathan
+Jacob 
+Hector 
+

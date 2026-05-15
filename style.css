@@ -5,8 +5,41 @@ html, body {
   color: white;
 }
 
+h2 {
+  font-size: 2em;
+  margin-top: 65px;
+}
+
+h3 {
+  font-size: 2em;
+  margin-top: 25;
+}
+
+.button-link {
+  display: inline-block;
+  background-color: #007bff;
+  color: ghostwhite;
+  align-items: center;
+  justify-content: center;
+  line-height: 20px;
+  text-align: center;
+  padding: 13px 0px;
+  width: 200px;
+  height: 20px;
+  text-decoration: none;
+  border-radius: 25px;
+  font-size: 20px;
+  border: 2px solid white;
+}
+
+.button-link:hover {
+  background-color:#0056b3;
+  color: whitesmoke;
+}
+
 canvas {
   margin: auto;
   display: block;
-
 }
+
+

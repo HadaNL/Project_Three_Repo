@@ -1,8 +1,8 @@
 # Project_Three_Repo
 This repo is for the Art 259 Final.
 
-Team Members
-Jonathan
-Jacob 
-Hector 
+Team Members\
+Jonathan\
+Jacob\
+Hector\
 

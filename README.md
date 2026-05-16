@@ -2,7 +2,7 @@
 This repo is for the Art 259 Final.
 
 Team Members\
-Jonathan\
-Jacob\
-Hector\
+Jonathan.M\
+Jacob.P\
+Hector.N
 
